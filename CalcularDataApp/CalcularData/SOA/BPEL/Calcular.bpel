@@ -197,10 +197,7 @@
         </documentation>
         <condition>$inputVariable.parameters/ns1:tipoResultado = 'meses'</condition>
         <sequence name="Sequence3">
-          <extensionActivity>
-            <bpelx:exec name="Java_Embedding1"/>
-          </extensionActivity>
-          <assign name="Assign_seta_meses_anos">
+          <assign name="Assign_calcular_meses_anos">
             <copy>
               <from>xp20:year-from-dateTime($inputVariable.parameters/ns1:dataInicial)</from>
               <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_anoDataInicial</to>
@@ -218,10 +215,44 @@
               <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_mesDataFinal</to>
             </copy>
           </assign>
+          <assign name="Assign_calcular_meses">
+            <copy>
+              <from>(($var_mesDataFinal + 12 * $var_anoDataFinal) – ($var_mesDataInicial + 12 * $var_anoDataInicial))</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
+            </copy>
+          </assign>
         </sequence>
       </elseif>
-      <else></else>
+      <else>
+        <documentation>
+          <![CDATA[resultado em anos]]>
+        </documentation>
+        <sequence name="Sequence4">
+          <assign name="Assign_seta_anos">
+            <copy>
+              <from>xp20:year-from-dateTime($inputVariable.parameters/ns1:dataInicial)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_anoDataInicial</to>
+            </copy>
+            <copy>
+              <from>xp20:year-from-dateTime($inputVariable.parameters/ns1:dataFinal)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_anoDataFinal</to>
+            </copy>
+          </assign>
+          <assign name="Assign_calcular_anos">
+            <copy>
+              <from>($var_anoDataFinal – $var_anoDataInicial)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
+            </copy>
+          </assign>
+        </sequence>
+      </else>
     </if>
+    <assign name="Assign_seta_saida">
+      <copy>
+        <from>$var_diferenca</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.parameters/ns1:diferenca</to>
+      </copy>
+    </assign>
     <!-- Generate reply to synchronous request -->
     <reply name="replyOutput" partnerLink="calcular_client" portType="ns1:Data_ptt" operation="CalcularDiferencaDatas"
            variable="outputVariable"/>

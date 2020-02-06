@@ -1,0 +1,15 @@
+<?xml version= '1.0' encoding= 'UTF-8' ?>
+<wsdl:definitions
+     name="pessoa"
+     targetNamespace="nauana.com"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+     xmlns:bpws="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+     xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype"
+     xmlns:tns="nauana.com"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    >
+    <plnk:partnerLinkType name="Calcular">
+        <plnk:role name="Data_ptt" portType="tns:Data_ptt"/>
+    </plnk:partnerLinkType>
+    <wsdl:import namespace="nauana.com" location="CalcularData.wsdl"/>
+</wsdl:definitions>

@@ -1,0 +1,44 @@
+<wsdl:definitions name="pessoa" targetNamespace="nauana.com" xmlns:tns="nauana.com"
+		xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+<wsdl:types>
+	<xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="nauana.com"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:inter="nauana.com">
+		<xsd:simpleType name="DataType">
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration value="dias"/>
+				<xsd:enumeration value="semanas"/>
+				<xsd:enumeration value="meses"/>
+				<xsd:enumeration value="ano"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+		<xsd:element name="CalcularDiferencaDatasRequestType">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element minOccurs="1" name="dataInicial" nillable="false" type="xsd:dateTime"/>
+					<xsd:element minOccurs="1" name="dataFinal" nillable="false" type="xsd:dateTime"/>
+					<xsd:element minOccurs="1" name="tipoResultado" nillable="false" type="inter:DataType"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+		<xsd:element name="CalcularDiferencaDatasResponseType">
+			<xsd:complexType>
+				<xsd:sequence>
+					<xsd:element minOccurs="1" name="diferenca" nillable="false" type="xsd:integer"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+</wsdl:types>
+<wsdl:message name="CalcularDiferencaDatasRequest">
+	<wsdl:part name="parameters" element="tns:CalcularDiferencaDatasRequestType"/>
+</wsdl:message>
+<wsdl:message name="CalcularDiferencaDatasResponse">
+	<wsdl:part name="parameters" element="tns:CalcularDiferencaDatasResponseType"/>
+</wsdl:message>
+<wsdl:portType name="Data_ptt">
+	<wsdl:operation name="CalcularDiferencaDatas" parameterOrder="parameters">
+		<wsdl:input message="tns:CalcularDiferencaDatasRequest"/>
+		<wsdl:output message="tns:CalcularDiferencaDatasResponse"/>
+	</wsdl:operation>
+</wsdl:portType>
+</wsdl:definitions>

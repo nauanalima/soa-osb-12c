@@ -1,0 +1,260 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Wed Feb 05 18:32:37 GMT-03:00 2020
+  Author:  nauana.nonato
+  Purpose: Synchronous BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="Calcular" targetNamespace="http://nauana.com/CalcularDataApp/CalcularData/Calcular"
+         xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:client="http://nauana.com/CalcularDataApp/CalcularData/Calcular"
+         xmlns:ora="http://schemas.oracle.com/xpath/extension" xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:ns1="nauana.com" xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ui="http://xmlns.oracle.com/soa/designer" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+         xmlns:oraext="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.ExtFunc"
+         xmlns:bpm="http://xmlns.oracle.com/bpmn20/extensions"
+         xmlns:xp20="http://www.oracle.com/XSL/Transform/java/oracle.tip.pc.services.functions.Xpath20"
+         xmlns:ess="http://xmlns.oracle.com/scheduler" xmlns:hwf="http://xmlns.oracle.com/bpel/workflow/xpath"
+         xmlns:xref="http://www.oracle.com/XSL/Transform/java/oracle.tip.xref.xpath.XRefXPathFunctions"
+         xmlns:dvm="http://www.oracle.com/XSL/Transform/java/oracle.tip.dvm.LookupValue"
+         xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+         xmlns:xdk="http://schemas.oracle.com/bpel/extension/xpath/function/xdk"
+         xmlns:ids="http://xmlns.oracle.com/bpel/services/IdentityService/xpath"
+         xmlns:ldap="http://schemas.oracle.com/xpath/extension/ldap">
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      PARTNERLINKS                                                      
+      List of services participating in this BPEL process               
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <import location="oracle.xml.parser.v2.XMLElement" importType="http://schemas.oracle.com/bpel/extension/java"/>
+  <import location="java.text.SimpleDateFormat" importType="http://schemas.oracle.com/bpel/extension/java"/>
+  <import location="java.text.ParseException" importType="http://schemas.oracle.com/bpel/extension/java"/>
+  <import location="java.util.Calendar" importType="http://schemas.oracle.com/bpel/extension/java"/>
+  <import namespace="nauana.com" location="../WSDLs/CalcularDataWrapper.wsdl"
+          importType="http://schemas.xmlsoap.org/wsdl/" ui:processWSDL="true"/>
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="calcular_client" partnerLinkType="ns1:Calcular" myRole="Data_ptt"/>
+  </partnerLinks>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="ns1:CalcularDiferencaDatasRequest"/>
+    <!-- Reference to the message that will be returned to the requester-->
+    <variable name="outputVariable" messageType="ns1:CalcularDiferencaDatasResponse"/>
+    <variable name="var_dataInicialEmMilissegundo" type="xsd:long"/>
+    <variable name="var_dataFinalEmMilissegundo" type="xsd:long"/>
+    <variable name="var_diferenca" type="xsd:integer"/>
+    <variable name="var_anoDataInicial" type="xsd:integer"/>
+    <variable name="var_anoDataFinal" type="xsd:integer"/>
+    <variable name="var_mesDataInicial" type="xsd:integer"/>
+    <variable name="var_mesDataFinal" type="xsd:integer"/>
+  </variables>
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+    <!-- Receive input from requestor. (Note: This maps to operation defined in Calcular.wsdl) -->
+    <receive name="receiveInput" partnerLink="calcular_client" portType="ns1:Data_ptt"
+             operation="CalcularDiferencaDatas" variable="inputVariable" createInstance="yes"/>
+    <if name="If_tipo_resultado">
+      <documentation>
+        <![CDATA[resultado em dias]]>
+      </documentation>
+      <condition>$inputVariable.parameters/ns1:tipoResultado = 'dias'</condition>
+      <sequence name="Sequence1">
+        <extensionActivity>
+          <bpelx:exec name="Java_Embedding_ms">
+            <![CDATA[try{ 
+     
+     
+    
+    XMLElement xmlElementDataInicial = (XMLElement)getVariableData("inputVariable","parameters","/ns1:CalcularDiferencaDatasRequestType/ns1:dataInicial"); 
+    XMLElement xmlElementDataFinal = (XMLElement)getVariableData("inputVariable","parameters","/ns1:CalcularDiferencaDatasRequestType/ns1:dataFinal"); 
+ 
+    String strDataInicial = xmlElementDataInicial.getTextContent(); 
+    String strDataFinal   = xmlElementDataFinal.getTextContent(); 
+ 
+ 
+    strDataInicial = strDataInicial.replace("T"," "); 
+    strDataFinal   = strDataFinal.replace("T"," "); 
+ 
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+    Calendar calendarDataInicial = Calendar.getInstance(); 
+    Calendar calendarDataFinal   = Calendar.getInstance(); 
+ 
+    calendarDataInicial.setTime(sdf.parse(strDataInicial)); 
+ 
+    calendarDataFinal.setTime(sdf.parse(strDataFinal)); 
+    
+    /*Remover hora da data inicial */ 
+    calendarDataInicial.set(calendarDataInicial.get(Calendar.YEAR), 
+                            calendarDataInicial.get(Calendar.MONTH), 
+                            calendarDataInicial.get(Calendar.DAY_OF_MONTH), 0, 0, 0); 
+ 
+    /*Remover hora da data final */ 
+    calendarDataFinal.set(calendarDataFinal.get(Calendar.YEAR), 
+                          calendarDataFinal.get(Calendar.MONTH), 
+                          calendarDataFinal.get(Calendar.DAY_OF_MONTH), 0, 0, 0); 
+    
+ 
+    setVariableData("var_dataInicialEmMilissegundo", calendarDataInicial.getTimeInMillis()); 
+ 
+    setVariableData("var_dataFinalEmMilissegundo", calendarDataFinal.getTimeInMillis()); 
+ 
+} catch (Exception e){          
+    System.out.println("exception "+e.getMessage()); 
+    addAuditTrailEntry(e); 
+}]]>
+          </bpelx:exec>
+        </extensionActivity>
+        <assign name="Assign_calcular_dias">
+          <copy>
+            <from>(($var_dataFinalEmMilissegundo - $var_dataInicialEmMilissegundo)  div  (24*3600*1000))</from>
+            <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
+          </copy>
+        </assign>
+      </sequence>
+      <elseif>
+        <documentation>
+          <![CDATA[resultado em semanas]]>
+        </documentation>
+        <condition>$inputVariable.parameters/ns1:tipoResultado = 'semanas'</condition>
+        <sequence name="Sequence2">
+          <extensionActivity>
+            <bpelx:exec name="Java_Embedding_ms">
+              <![CDATA[try{ 
+     
+     
+    
+    XMLElement xmlElementDataInicial = (XMLElement)getVariableData("inputVariable","parameters","/ns1:CalcularDiferencaDatasRequestType/ns1:dataInicial"); 
+    XMLElement xmlElementDataFinal = (XMLElement)getVariableData("inputVariable","parameters","/ns1:CalcularDiferencaDatasRequestType/ns1:dataFinal"); 
+ 
+    String strDataInicial = xmlElementDataInicial.getTextContent(); 
+    String strDataFinal   = xmlElementDataFinal.getTextContent(); 
+ 
+ 
+    strDataInicial = strDataInicial.replace("T"," "); 
+    strDataFinal   = strDataFinal.replace("T"," "); 
+ 
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"); 
+    Calendar calendarDataInicial = Calendar.getInstance(); 
+    Calendar calendarDataFinal   = Calendar.getInstance(); 
+ 
+    calendarDataInicial.setTime(sdf.parse(strDataInicial)); 
+ 
+    calendarDataFinal.setTime(sdf.parse(strDataFinal)); 
+    
+    /*Remover hora da data inicial */ 
+    calendarDataInicial.set(calendarDataInicial.get(Calendar.YEAR), 
+                            calendarDataInicial.get(Calendar.MONTH), 
+                            calendarDataInicial.get(Calendar.DAY_OF_MONTH), 0, 0, 0); 
+ 
+    /*Remover hora da data final */ 
+    calendarDataFinal.set(calendarDataFinal.get(Calendar.YEAR), 
+                          calendarDataFinal.get(Calendar.MONTH), 
+                          calendarDataFinal.get(Calendar.DAY_OF_MONTH), 0, 0, 0); 
+    
+ 
+    setVariableData("var_dataInicialEmMilissegundo", calendarDataInicial.getTimeInMillis()); 
+ 
+    setVariableData("var_dataFinalEmMilissegundo", calendarDataFinal.getTimeInMillis()); 
+ 
+} catch (Exception e){          
+    System.out.println("exception "+e.getMessage()); 
+    addAuditTrailEntry(e); 
+}]]>
+            </bpelx:exec>
+          </extensionActivity>
+          <assign name="Assign_calcular_semanas">
+            <copy>
+              <from>round(($var_dataFinalEmMilissegundo - $var_dataInicialEmMilissegundo) div (24*3600*1000*7))</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
+            </copy>
+          </assign>
+        </sequence>
+      </elseif>
+      <elseif>
+        <documentation>
+          <![CDATA[resultado em meses]]>
+        </documentation>
+        <condition>$inputVariable.parameters/ns1:tipoResultado = 'meses'</condition>
+        <sequence name="Sequence3">
+          <assign name="Assign_calcular_meses_anos">
+            <copy>
+              <from>xp20:year-from-dateTime($inputVariable.parameters/ns1:dataInicial)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_anoDataInicial</to>
+            </copy>
+            <copy>
+              <from>xp20:year-from-dateTime($inputVariable.parameters/ns1:dataFinal)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_anoDataFinal</to>
+            </copy>
+            <copy>
+              <from>xp20:month-from-dateTime($inputVariable.parameters/ns1:dataInicial)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_mesDataInicial</to>
+            </copy>
+            <copy>
+              <from>xp20:month-from-dateTime($inputVariable.parameters/ns1:dataFinal) </from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_mesDataFinal</to>
+            </copy>
+          </assign>
+          <assign name="Assign_calcular_meses">
+            <copy>
+              <from>(($var_mesDataFinal + 12 * $var_anoDataFinal) - ($var_mesDataInicial + 12 * $var_anoDataInicial))</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
+            </copy>
+          </assign>
+        </sequence>
+      </elseif>
+      <else>
+        <documentation>
+          <![CDATA[resultado em anos]]>
+        </documentation>
+        <sequence name="Sequence4">
+          <assign name="Assign_seta_anos">
+            <copy>
+              <from>xp20:year-from-dateTime($inputVariable.parameters/ns1:dataInicial)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_anoDataInicial</to>
+            </copy>
+            <copy>
+              <from>xp20:year-from-dateTime($inputVariable.parameters/ns1:dataFinal)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_anoDataFinal</to>
+            </copy>
+          </assign>
+          <assign name="Assign_calcular_anos">
+            <copy>
+              <from>($var_anoDataFinal - $var_anoDataInicial)</from>
+              <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
+            </copy>
+          </assign>
+        </sequence>
+      </else>
+    </if>
+    <assign name="Assign_seta_saida">
+      <copy>
+        <from>$var_diferenca</from>
+        <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$outputVariable.parameters/ns1:diferenca</to>
+      </copy>
+    </assign>
+    <!-- Generate reply to synchronous request -->
+    <reply name="replyOutput" partnerLink="calcular_client" portType="ns1:Data_ptt" operation="CalcularDiferencaDatas"
+           variable="outputVariable"/>
+  </sequence>
+</process>

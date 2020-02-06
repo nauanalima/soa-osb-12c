@@ -127,7 +127,7 @@
         </extensionActivity>
         <assign name="Assign_calcular_dias">
           <copy>
-            <from>(($var_dataFinalEmMilissegundo – $var_dataInicialEmMilissegundo)  div  (24*3600*1000))</from>
+            <from>(($var_dataFinalEmMilissegundo - $var_dataInicialEmMilissegundo)  div  (24*3600*1000))</from>
             <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
           </copy>
         </assign>
@@ -185,7 +185,7 @@
           </extensionActivity>
           <assign name="Assign_calcular_semanas">
             <copy>
-              <from>round(($var_dataFinalEmMilissegundo – $var_dataInicialEmMilissegundo) div (24*3600*1000*7))</from>
+              <from>round(($var_dataFinalEmMilissegundo - $var_dataInicialEmMilissegundo) div (24*3600*1000*7))</from>
               <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
             </copy>
           </assign>
@@ -217,7 +217,7 @@
           </assign>
           <assign name="Assign_calcular_meses">
             <copy>
-              <from>(($var_mesDataFinal + 12 * $var_anoDataFinal) – ($var_mesDataInicial + 12 * $var_anoDataInicial))</from>
+              <from>(($var_mesDataFinal + 12 * $var_anoDataFinal) - ($var_mesDataInicial + 12 * $var_anoDataInicial))</from>
               <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
             </copy>
           </assign>
@@ -240,7 +240,7 @@
           </assign>
           <assign name="Assign_calcular_anos">
             <copy>
-              <from>($var_anoDataFinal – $var_anoDataInicial)</from>
+              <from>($var_anoDataFinal - $var_anoDataInicial)</from>
               <to expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">$var_diferenca</to>
             </copy>
           </assign>

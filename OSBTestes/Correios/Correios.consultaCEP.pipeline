@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:coreEntry>
+        <con:binding type="SOAP" isSoap12="false" xsi:type="con:SoapBindingType">
+            <con:wsdl ref="Correios/Correios.consultaCEP"/>
+            <con:binding>
+                <con:name>consultaCEPBinding</con:name>
+                <con:namespace>http://www.nauana.com/Correios/consultaCEP</con:namespace>
+            </con:binding>
+        </con:binding>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:pipeline type="request" name="request-N53effdfc.197c2918.0.1701fd1278c.N7f5f">
+            <con:stage id="_StageId-N53effdfc.197c2918.0.1701fd1278c.N7f50" name="PrepararRequest">
+                <con:context/>
+                <con:actions>
+                    <con1:replace varName="body" contents-only="true" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+                        <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-N53effdfc.197c2918.0.1701fd1278c.N7f47</con2:id>
+                        <con1:location>
+                            <con2:xpathText xmlns:con2="http://www.bea.com/wli/sb/stages/config">.</con2:xpathText>
+                        </con1:location>
+                        <con1:expr>
+                            <con2:xsltTransform xmlns:con2="http://www.bea.com/wli/sb/stages/config">
+                                <con2:resource ref="Correios/Correios.consultaCEP.OSBToCorreios"/>
+                                <con2:input>$body</con2:input>
+                            </con2:xsltTransform>
+                        </con1:expr>
+                    </con1:replace>
+                </con:actions>
+            </con:stage>
+            <con:stage id="_StageId-N53effdfc.197c2918.0.1701fd1278c.N7f5d" name="Validar">
+                <con:context/>
+                <con:actions>
+                    <con1:validate xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config">
+                        <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-N53effdfc.197c2918.0.1701fd1278c.N7f52</con2:id>
+                        <con1:schema ref="Correios/Correios.consultaCEP"/>
+                        <con1:schemaElement xmlns:nau="http://www.nauana.com">nau:consultaCEPRequest</con1:schemaElement>
+                        <con1:varName>body</con1:varName>
+                        <con1:location>
+                            <con2:xpathText xmlns:con2="http://www.bea.com/wli/sb/stages/config">.</con2:xpathText>
+                        </con1:location>
+                    </con1:validate>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-N53effdfc.197c2918.0.1701fd1278c.N7f5e">
+            <con:stage id="_StageId-N53effdfc.197c2918.0.1701fd1278c.N7f5c" name="Stage1">
+                <con:context/>
+                <con:actions/>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="request" name="request-N53effdfc.197c2918.0.1701fd1278c.N7f5b">
+            <con:stage id="_StageId-N53effdfc.197c2918.0.1701fd1278c.N7f59" name="Stage1">
+                <con:context/>
+                <con:actions/>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-N53effdfc.197c2918.0.1701fd1278c.N7f5a">
+            <con:stage id="_StageId-N53effdfc.197c2918.0.1701fd1278c.N7f58" name="Stage1">
+                <con:context/>
+                <con:actions/>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:branch-node type="operation" id="_FlowId-N53effdfc.197c2918.0.1701fd1278c.N7f91" name="BranchNode1">
+                <con:context/>
+                <con:branch-table>
+                    <con:branch name="consultaCEP">
+                        <con:operator>equals</con:operator>
+                        <con:value/>
+                        <con:flow>
+                            <con:pipeline-node name="Pipeline Pair Node1">
+                                <con:request>request-N53effdfc.197c2918.0.1701fd1278c.N7f5f</con:request>
+                                <con:response>response-N53effdfc.197c2918.0.1701fd1278c.N7f5e</con:response>
+                            </con:pipeline-node>
+                            <con:route-node name="RouteNode1">
+                                <con:context/>
+                                <con:actions>
+                                    <con1:route xmlns:con1="http://www.bea.com/wli/sb/stages/routing/config">
+                                        <con2:id xmlns:con2="http://www.bea.com/wli/sb/stages/config">_ActionId-N53effdfc.197c2918.0.1701fd1278c.N7f55</con2:id>
+                                        <con1:service ref="Correios/Correios" xsi:type="ref:BusinessServiceRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                                        <con1:operation>consultaCEP</con1:operation>
+                                        <con1:outboundTransform/>
+                                        <con1:responseTransform/>
+                                    </con1:route>
+                                </con:actions>
+                            </con:route-node>
+                        </con:flow>
+                    </con:branch>
+                    <con:default-branch>
+                        <con:flow>
+                            <con:pipeline-node name="Pipeline Pair Node2">
+                                <con:request>request-N53effdfc.197c2918.0.1701fd1278c.N7f5b</con:request>
+                                <con:response>response-N53effdfc.197c2918.0.1701fd1278c.N7f5a</con:response>
+                            </con:pipeline-node>
+                        </con:flow>
+                    </con:default-branch>
+                </con:branch-table>
+            </con:branch-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>

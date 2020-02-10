@@ -195,6 +195,6 @@
          </list>
       </hash>
    </hash>
-   <value n="SOA_TRANSFORMATION_FOLDER_NAME" v=""/>
+   <value n="SOA_TRANSFORMATION_FOLDER_NAME" v="v1.0/Transformations/XSLT/"/>
    <value n="SOA_WSDL_FOLDER_NAME" v=""/>
 </jpr:project>
